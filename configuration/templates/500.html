@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal error</title>
+    <style>
+          /*Style the outline boxes*/
+    * {
+      box-sizing: border-box;
+      border-radius: 12px;
+    }
+
+    body {
+      font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+        background-color: black;
+    }
+
+    button {
+        border: white;
+        color: black;
+        padding: 12px 28px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 20px;
+        margin: 4px 2px;
+        cursor: pointer;
+        background-color: #98a0b0;
+        border-radius: 15px;
+        float: right;
+    }
+
+    .info-box,
+    textarea,
+    select{
+        box-sizing: border-box;
+        border:1px solid #BEBEBE;
+        border-radius: 12px;
+        padding: 10px;
+        margin:5px;
+        width: 760px;
+        font-size: 18px;
+        font-weight: bold;
+        background: black;
+        color: cyan;
+        text-align: left;
+        outline: none;
+    }
+
+    /*Style the station details text*/
+    .station {
+        color: white;
+        float: right;
+    }
+    </style>
+</head>
+<body>
+    <div>
+        <img src="../static/MO_img.jpg" alt="MO logo" style="width:170px;height:50px;float: left">
+        <div class="station"><h4>{{sensor_name}} - {{location_name}} {{device_id}}&nbsp&nbsp</h4></div>
+        <br><br><br>
+    </div>
+    <div class="info-box">
+        <h2>** Unable to display dashboard data **</h2>
+        This is most likely because:<br>
+                <ul>
+                    <li>The sensor is not operating.</li>
+                    <li>The sensor is out of range.</li>
+                    <li>An error occurred whilst processing the sensor data.</li>
+                </ul><br>
+        Use the button below to try reloading the dashboard.<br><br>
+    </div>
+    <div>
+        <button class="button" onclick="window.location.href='http://localhost';" type="button">Go back to dashboard</button>
+    </div>
+</body>
+</html>

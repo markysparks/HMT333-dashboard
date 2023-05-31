@@ -1,0 +1,52 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-python:3.9-build
+
+# Set our working directory
+WORKDIR /usr/src/app
+
+# Copy requirements.txt first for better cache on later pushes
+COPY requirements.txt requirements.txt
+
+# pip install python deps from requirements.txt on the resin.io build server
+RUN pip3 install -r requirements.txt
+
+# This will copy all files in our root to the working  directory in the container
+COPY . ./
+
+ARG WOW_ENABLE
+ARG SITE_ID
+ARG AUTH_CODE
+ARG USE_UI_WOW
+ARG WOW_URL
+ARG SOFTWARETYPE
+ARG TEMPERATURE_URL
+ARG OLD_DATA_TIME
+ARG API_KEY
+ARG MAX_MIN_ENABLE
+ARG MIN_TEMP_ENABLE
+ARG WOW_MAX_MIN_MINUTE
+ARG WOW_MAX_MIN_HOUR
+ARG WOW_TX_MINUTE
+ARG DATA_POINTS_REQ
+ARG ROUTINE_REPORT
+ARG INTERNET_CHECK
+
+ENV WOW_ENABLE=${WOW_ENABLE}
+ENV SITE_ID=${SITE_ID}
+ENV AUTH_CODE=${AUTH_CODE}
+ENV USE_UI_WOW=${USE_UI_WOW}
+ENV WOW_URL=${WOW_URL}
+ENV SOFTWARETYPE=${SOFTWARETYPE}
+ENV TEMPERATURE_URL=${TEMPERATURE_URL}
+ENV OLD_DATA_TIME=${OLD_DATA_TIME}
+ENV API_KEY=${API_KEY}
+ENV MAX_MIN_ENABLE=${MAX_MIN_ENABLE}
+ENV MIN_TEMP_ENABLE=${MIN_TEMP_ENABLE}
+ENV WOW_MAX_MIN_MINUTE=${WOW_MAX_MIN_MINUTE}
+ENV WOW_MAX_MIN_HOUR=${WOW_MAX_MIN_HOUR}
+ENV WOW_TX_MINUTE=${WOW_TX_MINUTE}
+ENV DATA_POINTS_REQ=${DATA_POINTS_REQ}
+ENV ROUTINE_REPORT=${ROUTINE_REPORT}
+ENV INTERNET_CHECK=${INTERNET_CHECK}
+
+# script to run when container starts up on the device
+CMD ["python3","-u","metoffice_wow.py"]

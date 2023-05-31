@@ -1,0 +1,105 @@
+version: '2.1'
+volumes:
+  settings:
+  dashboard-data:
+  sensor-data:
+services:
+
+  scheduler:
+    restart: always
+    build: ./scheduler
+    privileged: true
+
+  wifi-connect:
+    image: bh.cr/balenalabs/wifi-connect-aarch64
+    restart: always
+    network_mode: host
+    privileged: true
+    labels:
+      io.balena.features.dbus: "1"
+      io.balena.features.firmware: "1"
+
+  hmt333:
+    privileged: true
+    build: ./hmt333
+    restart: always
+    expose:
+      - '7575'
+    volumes:
+      - 'settings:/data'
+
+  metoffice-wow-prod:
+    build: ./metoffice-wow-prod
+    restart: always
+    depends_on:
+      - hmt333
+    labels:
+      io.balena.features.supervisor-api: 1  # necessary to allow reboot if no internet connection
+    volumes:
+      - 'settings:/data'
+
+  influxdb:
+    image: influxdb@sha256:73f876e0c3bd02900f829d4884f53fdfffd7098dd572406ba549eed955bf821f
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUX_DATA_DIR=/data
+      - PERSISTENT=1
+    volumes:
+      - 'sensor-data:/data'
+
+  telegraf:
+    build: ./telegraf
+    restart: always
+    privileged: true
+    depends_on:
+      - influxdb
+      - hmt333
+    labels:
+      io.resin.features.balena-socket: '1'
+      io.balena.features.supervisor-api: 1  # necessary to discover services in local mode
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_DB=balena
+
+  dashboard:
+    image: bh.cr/balenalabs/dashboard
+    restart: always
+    depends_on:
+      - influxdb
+      - telegraf
+    volumes:
+      - 'dashboard-data:/data'
+    ports:
+      - '80'
+
+  configuration:
+    build: ./configuration
+    restart: on-failure
+    privileged: true
+    depends_on:
+      - hmt333
+    ports:
+    - '8080'
+    volumes:
+      - 'settings:/data'
+
+# The following 'browser section' should be commented out for the HMT datahub
+  browser:
+    # image: balenablocks/browser:raspberrypi4-64
+    # image: bhcr.io/balenablocks/browser-aarch64 # where <arch> is one of aarch64, arm32 or amd64
+    image: bh.cr/balenalabs/browser-aarch64
+    privileged: true # required for UDEV to find plugged in peripherals such as a USB mouse
+    network_mode: host
+    depends_on:
+      - dashboard
+    environment:
+      - LAUNCH_URL=http://0.0.0.0
+      - ENABLE_GPU=0
+      - KIOSK=1
+      - LOCAL_HTTP_DELAY=8
+      - PERSISTENT=1
+      - WINDOW_SIZE=800,600
+      - WINDOW_POSITION=0,0
+    volumes:
+      - 'settings:/data' # Only required if using PERSISTENT flag (see below)

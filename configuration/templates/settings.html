@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--suppress XmlDuplicatedId -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HMT330 Remote Display Settings</title>
+    <style>
+        /*Style the outline boxes*/
+    * {
+      box-sizing: border-box;
+      border-radius: 12px;
+    }
+
+    /*Style main body of page*/
+    body {
+      font-family: "Lucinda Sans Unicode", "Lucinda Grande", sans-serif;
+        background-color: black;
+    }
+
+    .button {
+        border-radius: 12px;
+        font-size: 16px;
+        padding: 12px;
+        margin: 15px;
+    }
+
+    /* Style the main temperature data section*/
+    .wow {
+      float: left;
+      width: 69%;
+      background: black;
+      padding: 10px;
+    }
+
+    /*Style the Max Min temperature section*/
+    .temp_corrs {
+      float: right;
+      padding: 5px;
+      width: 31%;
+      background-color: #1c2f62;
+    }
+
+    /*General form styling*/
+     .form-style {
+        margin: 3px auto;
+        max-width: 760px;
+        padding: 1px;
+        font: 10px "Lucinda Sans Unicode", "Lucinda Grande", sans-serif;
+    }
+
+     /*Data field title labels*/
+    .form-style label{
+        color: white;
+        padding: 3px;
+        margin: 0;
+        display:block;
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+   /*WoW station ID field and calibration date*/
+    .form-style input[type=text], .form-style input[type=date],
+    select{
+        box-sizing: border-box;
+        border:1px solid #BEBEBE;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 1px;
+        width: 180px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #ffffff;
+        color: black;
+        text-align: center;
+        outline: none;
+    }
+
+    /*WoW station password field*/
+    .form-style input[type=password], .form-style input[type=date],
+    select{
+        box-sizing: border-box;
+        border:1px solid #BEBEBE;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 1px;
+        width: 180px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #ffffff;
+        color: black;
+        text-align: center;
+        outline: none;
+    }
+
+    /*Temperature correction fields*/
+    .form-style input[type=number],
+    select{
+        box-sizing: border-box;
+        border:1px solid #BEBEBE;
+        border-radius: 5px;
+        padding: 1px;
+        margin: 1px;
+        width: 90px;
+        font-size: 20px;
+        font-weight: bold;
+        background: #fdfdfd;
+        color: black;
+        text-align: center;
+        outline: none;
+    }
+
+     /*WoW station enable checkbox*/
+    .form-style input[type=checkbox],
+    select{
+        width: 20px;
+        height: 20px;
+    }
+    </style>
+</head>
+<body>
+    <div>
+    <!--Settings form display area-->
+        <form class="form-style" action="" method="POST">
+            <fieldset>
+
+                <!--WoW credentials fields-->
+                    <div class="wow">
+                        <label for="site_id"><span>WoW site ID: <br><small><i>(e.g. c57a4298-b640-eb11-8fed-0003ff5982ed)</i></small><br></span>
+                            <input type="text" value='{{site_id}}' placeholder="c57a4298-b640-eb11-8fed-0003ff5982ed" style="width: 475px" id="site_id" name="site_id"></label><br><br>
+
+                        <label for="auth_code"><span>Authentication code (6 digits):<br></span>
+                            <input type="password" id="auth_code" name="auth_code" placeholder="123456" style="width: 120px" value='{{auth_code}}'></label><br><br>
+
+                        <!--WoW Enable / Disable-->
+                        {% if wow_enable == "true": %}
+                        <label for="wow_enable_checked"> Enable WoW transmissions: &nbsp <span><input type="checkbox" checked id="wow_enable_checked" name="wow_enable" value="true"></span></label>
+                        {% else %}
+                        <label for="wow_enable"> Enable WoW transmissions: &nbsp <span><input type="checkbox" id="wow_enable" name="wow_enable" value="false"></span></label>
+                        {% endif %}
+                        <br><br><hr><br>
+
+                    <!--Save configuration / go back to dashboard buttons-->
+                        <button class="button" onclick="window.location.href='http://0.0.0.0';" type="button">Back to dashboard</button>
+                        <button class="button" type="submit">Save configuration</button>
+                        <br>
+                        <a href="{{ url_for('download_file') }}"><h2>Download max/min report file</h2></a>
+                        <h1><em style="color: darkorange">{{message}}</em></h1>
+                    </div>
+
+                    <!--Temperature correction fields-->
+                    <div class="temp_corrs">
+                        <label for="serial_no"><span>HMT Serial No:</span>
+                                <input type="text" required value='{{serial_no}}' placeholder="E12345678" id="serial_no" name="serial_no"></label>
+
+                    <!--Calibration / Recalibration-->
+                        {% if recalibrate == "true": %}
+                        <label for="calibration_date"><span>Calibration DUE: &nbsp&nbsp&nbsp&nbsp (MM/DD/YYYY):</span>
+                                <input style="background-color: red" type="date" required value='{{calibration_date}}' id="calibration_date" name="calibration_date"></label>
+                        {% else %}
+                        <label for="calibration_date"><span>Calibration DUE: &nbsp&nbsp&nbsp&nbsp (MM/DD/YYYY):</span>
+                                <input style="background-color: green" type="date" required value='{{calibration_date}}' id="calibration_date" name="calibration_date"></label>
+                        {% endif %}
+
+                    <!--Sensor calibration coefficients-->
+                        <label for="corr_50" style="float: left"><span>Cor +50&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_50}}' placeholder="0.0" id="corr_50" name="corr_50"></label>
+
+                        <label for="corr_0" style="float: right"><span>Cor &nbsp&nbsp&nbsp&nbsp0&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_0}}' placeholder="0.0" id="corr_0" name="corr_0"></label>
+
+                        <label for="corr_40" style="float: left"><span>Cor +40&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_40}}' placeholder="0.0" id="corr_40" name="corr_40"></label>
+
+                        <label for="corr_M10" style="float: right"><span>Cor -10&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_M10}}' placeholder="0.0" id="corr_M10" name="corr_M10"></label>
+
+                        <label for="corr_30" style="float: left"><span>Cor +30&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_30}}' placeholder="0.0" id="corr_30" name="corr_30"></label>
+
+                        <label for="corr_M20" style="float: right"><span>Cor -20&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_M20}}' placeholder="0.0" id="corr_M20" name="corr_M20"></label>
+
+                        <label for="corr_20" style="float: left"><span>Cor +20&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_20}}' placeholder="0.0" id="corr_20" name="corr_20"></label>
+
+                        <label for="corr_M30" style="float: right"><span>Cor -30&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_M30}}' placeholder="0.0" id="corr_M30" name="corr_M30"></label>
+
+                        <label for="corr_10" style="float: left"><span>Cor +10&#8451;:<br></span>
+                                <input type="number" step="0.1" required value='{{corr_10}}' placeholder="0.0" id="corr_10" name="corr_10"></label>
+                    </div>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>
