@@ -1,4 +1,4 @@
-# **Met Office HMT333 temperature sensor data display unit.**
+# **HMT333 temperature sensor data display unit.**
 
 * [Introduction](#introduction)
 * [Hardware requirements](#hardware-requirements)
